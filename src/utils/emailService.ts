@@ -10,7 +10,7 @@ export interface EmailTemplate {
 }
 
 // Modèles par défaut (peuvent être récupérés depuis localStorage ou une base de données)
-const getEmailTemplates = (): EmailTemplate[] => {
+export const getEmailTemplates = (): EmailTemplate[] => {
   const saved = localStorage.getItem('emailTemplates');
   if (saved) {
     try {
