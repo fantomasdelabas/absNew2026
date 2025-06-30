@@ -1,72 +1,19 @@
 import React, { useState, useRef } from 'react';
 import { Settings, Upload, Download, FileSpreadsheet, Users, AlertCircle, CheckCircle, Trash2, Mail, Edit3, Save, Eye } from 'lucide-react';
 import { Student } from '../types';
+import { EmailTemplate, getEmailTemplates, saveEmailTemplates } from '../utils/emailService';
 import * as XLSX from 'xlsx';
 
 interface ConfigurationProps {
   onStudentsImported: (students: Student[]) => void;
 }
 
-interface EmailTemplate {
-  id: string;
-  name: string;
-  subject: string;
-  body: string;
-  type: 'absence' | 'alert' | 'reminder';
-}
-
-const defaultTemplates: EmailTemplate[] = [
-  {
-    id: 'absence',
-    name: 'Absence du jour',
-    type: 'absence',
-    subject: 'Absence non justifiée - {studentName}',
-    body: `Bonjour,
-
-Nous vous informons que votre enfant {studentName} était absent(e) le {date} {period}.
-
-Nous vous remercions de bien vouloir justifier cette absence dans les plus brefs délais.
-
-Cordialement,
-L'équipe pédagogique`
-  },
-  {
-    id: 'alert',
-    name: 'Alerte seuil dépassé',
-    type: 'alert',
-    subject: 'ALERTE - Absences répétées de {studentName}',
-    body: `Bonjour,
-
-Nous attirons votre attention sur le fait que votre enfant {studentName} a accumulé {absenceCount} demi-jours d'absences injustifiées.
-
-Ce nombre dépasse le seuil d'alerte fixé par l'établissement. Nous vous demandons de prendre contact avec nous rapidement pour régulariser cette situation.
-
-Une rencontre pourrait être nécessaire pour discuter de l'assiduité de votre enfant.
-
-Cordialement,
-La direction`
-  },
-  {
-    id: 'reminder',
-    name: 'Rappel justification',
-    type: 'reminder',
-    subject: 'Rappel - Justification d\'absence requise pour {studentName}',
-    body: `Bonjour,
-
-Nous vous rappelons qu'une justification est encore attendue pour l'absence de votre enfant {studentName} du {date}.
-
-Merci de nous faire parvenir le justificatif dans les meilleurs délais (certificat médical, mot d'excuse, etc.).
-
-Cordialement,
-Le secrétariat`
-  }
-];
 
 export const Configuration: React.FC<ConfigurationProps> = ({ onStudentsImported }) => {
   const [importStatus, setImportStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [importMessage, setImportMessage] = useState('');
   const [importedCount, setImportedCount] = useState(0);
-  const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>(defaultTemplates);
+  const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>(getEmailTemplates());
   const [editingTemplate, setEditingTemplate] = useState<string | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -186,8 +133,8 @@ export const Configuration: React.FC<ConfigurationProps> = ({ onStudentsImported
   };
 
   const saveTemplate = (templateId: string) => {
+    saveEmailTemplates(emailTemplates);
     setEditingTemplate(null);
-    // Ici on pourrait sauvegarder dans localStorage ou une base de données
     console.log('Template sauvegardé:', templateId);
   };
 
