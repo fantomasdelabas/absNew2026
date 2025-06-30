@@ -3,19 +3,25 @@ import { GraduationCap, Home, Users, Calendar, BarChart3, Settings } from 'lucid
 import { useAttendance } from './hooks/useAttendance';
 import { Dashboard } from './components/Dashboard';
 import { StudentList } from './components/StudentList';
+import { StudentDetails } from './components/StudentDetails';
+import { Student } from './types';
 import { AttendanceEncoder } from './components/AttendanceEncoder';
 import { Configuration } from './components/Configuration';
 
-type View = 'dashboard' | 'students' | 'attendance' | 'configuration';
+type View = 'dashboard' | 'students' | 'studentDetail' | 'attendance' | 'configuration';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('dashboard');
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const {
     students,
     calculateAttendanceSummary,
     addStudents,
     updateAttendance,
-    getStudentAttendanceForDate
+    getStudentAttendanceForDate,
+    attendanceRecords,
+    emailLogs,
+    addEmailLog
   } = useAttendance();
 
   const navigationItems = [
@@ -29,16 +35,31 @@ function App() {
     switch (currentView) {
       case 'dashboard':
         return (
-          <Dashboard 
-            students={students} 
+          <Dashboard
+            students={students}
             getAttendanceSummary={calculateAttendanceSummary}
+            addEmailLog={addEmailLog}
           />
         );
       case 'students':
         return (
-          <StudentList 
-            students={students} 
+          <StudentList
+            students={students}
             getAttendanceSummary={calculateAttendanceSummary}
+            onStudentSelect={(s) => {
+              setSelectedStudent(s);
+              setCurrentView('studentDetail');
+            }}
+          />
+        );
+      case 'studentDetail':
+        if (!selectedStudent) return null;
+        return (
+          <StudentDetails
+            student={selectedStudent}
+            attendanceRecords={attendanceRecords}
+            emailLogs={emailLogs}
+            onBack={() => setCurrentView('students')}
           />
         );
       case 'attendance':
@@ -47,6 +68,7 @@ function App() {
             students={students}
             updateAttendance={updateAttendance}
             getStudentAttendanceForDate={getStudentAttendanceForDate}
+            addEmailLog={addEmailLog}
           />
         );
       case 'configuration':
