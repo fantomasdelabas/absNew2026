@@ -10,7 +10,13 @@ type View = 'dashboard' | 'students' | 'attendance' | 'configuration';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('dashboard');
-  const { students, calculateAttendanceSummary, addStudents } = useAttendance();
+  const {
+    students,
+    calculateAttendanceSummary,
+    addStudents,
+    updateAttendance,
+    getStudentAttendanceForDate
+  } = useAttendance();
 
   const navigationItems = [
     { id: 'dashboard', label: 'Tableau de Bord', icon: Home },
@@ -36,7 +42,13 @@ function App() {
           />
         );
       case 'attendance':
-        return <AttendanceEncoder students={students} />;
+        return (
+          <AttendanceEncoder
+            students={students}
+            updateAttendance={updateAttendance}
+            getStudentAttendanceForDate={getStudentAttendanceForDate}
+          />
+        );
       case 'configuration':
         return <Configuration onStudentsImported={addStudents} />;
       default:
