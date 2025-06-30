@@ -16,6 +16,7 @@ interface AttendanceEncoderProps {
     period: 'morning' | 'afternoon',
     status: AttendanceStatus
   ) => void;
+  addEmailLog: (studentId: string, templateType: 'absence' | 'alert' | 'reminder') => void;
 }
 
 interface PendingAttendance {
@@ -27,7 +28,8 @@ interface PendingAttendance {
 export const AttendanceEncoder: React.FC<AttendanceEncoderProps> = ({
   students,
   getStudentAttendanceForDate,
-  updateAttendance
+  updateAttendance,
+  addEmailLog
 }) => {
   const [selectedDate, setSelectedDate] = useState(getTodayString());
   const [showSaveConfirmation, setShowSaveConfirmation] = useState(false);
@@ -109,6 +111,7 @@ export const AttendanceEncoder: React.FC<AttendanceEncoderProps> = ({
 
   const handleSendEmail = (student: Student, period: 'matin' | 'après-midi') => {
     sendEmailToParent(student, selectedDate, period);
+    addEmailLog(student.id, 'absence');
   };
 
   const getStatusBadge = (status: AttendanceStatus) => (

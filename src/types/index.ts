@@ -25,6 +25,13 @@ export interface AttendanceSummary {
   totalPresent: number;
 }
 
+export interface EmailLog {
+  id: string;
+  studentId: string;
+  dateSent: string;
+  templateType: 'absence' | 'alert' | 'reminder';
+}
+
 export const STATUS_LABELS: Record<AttendanceStatus, string> = {
   'I': 'Présent',
   'E': 'Excusé',

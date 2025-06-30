@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
-import { AttendanceRecord, AttendanceSummary, Student, AttendanceStatus } from '../types';
+import { AttendanceRecord, AttendanceSummary, Student, AttendanceStatus, EmailLog } from '../types';
 import { mockAttendanceRecords, mockStudents } from '../data/mockData';
 
 export const useAttendance = () => {
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>(mockAttendanceRecords);
   const [students, setStudents] = useState<Student[]>(mockStudents);
+  const [emailLogs, setEmailLogs] = useState<EmailLog[]>([]);
 
   // Debug: afficher les enregistrements dans la console
   useEffect(() => {
@@ -108,10 +109,20 @@ export const useAttendance = () => {
       const uniqueNewStudents = newStudents.filter(
         student => !existingEmails.has(student.parentEmail.toLowerCase())
       );
-      
+
       console.log(`Ajout de ${uniqueNewStudents.length} nouveaux élèves`);
       return [...prev, ...uniqueNewStudents];
     });
+  };
+
+  const addEmailLog = (studentId: string, templateType: 'absence' | 'alert' | 'reminder') => {
+    const log: EmailLog = {
+      id: `${Date.now()}-${Math.random()}`,
+      studentId,
+      dateSent: new Date().toISOString(),
+      templateType
+    };
+    setEmailLogs(prev => [...prev, log]);
   };
 
   const getAttendanceForDate = (date: string): AttendanceRecord[] => {
@@ -127,7 +138,9 @@ export const useAttendance = () => {
   return {
     students,
     attendanceRecords,
+    emailLogs,
     updateAttendance,
+    addEmailLog,
     addStudents,
     getAttendanceForDate,
     getStudentAttendanceForDate,

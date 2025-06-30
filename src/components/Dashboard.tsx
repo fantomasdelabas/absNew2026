@@ -6,6 +6,7 @@ import { sendAlertEmail } from '../utils/emailService';
 interface DashboardProps {
   students: Student[];
   getAttendanceSummary: (studentId: string) => AttendanceSummary;
+  addEmailLog: (studentId: string, templateType: 'absence' | 'alert' | 'reminder') => void;
 }
 
 type SortField = 'name' | 'class' | 'present' | 'excused' | 'medical' | 'unjustified';
@@ -17,7 +18,7 @@ interface ColumnFilter {
   maxValue?: number;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSummary }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSummary, addEmailLog }) => {
   const [sortField, setSortField] = useState<SortField>('unjustified');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([]);
@@ -145,6 +146,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSum
 
   const handleSendAlertEmail = (student: Student, absenceCount: number) => {
     sendAlertEmail(student, absenceCount);
+    addEmailLog(student.id, 'alert');
   };
 
   const getSortIcon = (field: SortField) => {
