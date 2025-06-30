@@ -1,11 +1,21 @@
 import React, { useState, useMemo } from 'react';
 import { Calendar, Save, Mail, Check, Search, Filter, AlertCircle } from 'lucide-react';
 import { Student, AttendanceStatus, STATUS_LABELS, STATUS_COLORS } from '../types';
-import { useAttendance } from '../hooks/useAttendance';
+import { AttendanceRecord } from '../types';
 import { sendEmailToParent, formatDate, getTodayString } from '../utils/emailService';
 
 interface AttendanceEncoderProps {
   students: Student[];
+  getStudentAttendanceForDate: (
+    studentId: string,
+    date: string
+  ) => AttendanceRecord | null;
+  updateAttendance: (
+    studentId: string,
+    date: string,
+    period: 'morning' | 'afternoon',
+    status: AttendanceStatus
+  ) => void;
 }
 
 interface PendingAttendance {
@@ -14,14 +24,17 @@ interface PendingAttendance {
   afternoonStatus: AttendanceStatus;
 }
 
-export const AttendanceEncoder: React.FC<AttendanceEncoderProps> = ({ students }) => {
+export const AttendanceEncoder: React.FC<AttendanceEncoderProps> = ({
+  students,
+  getStudentAttendanceForDate,
+  updateAttendance
+}) => {
   const [selectedDate, setSelectedDate] = useState(getTodayString());
   const [showSaveConfirmation, setShowSaveConfirmation] = useState(false);
   const [nameFilter, setNameFilter] = useState('');
   const [classFilter, setClassFilter] = useState('');
   const [pendingChanges, setPendingChanges] = useState<Record<string, PendingAttendance>>({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const { getStudentAttendanceForDate, updateAttendance } = useAttendance();
 
   // Obtenir la liste unique des classes
   const availableClasses = useMemo(() => {
