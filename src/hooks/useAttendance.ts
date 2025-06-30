@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { AttendanceRecord, AttendanceSummary, Student, AttendanceStatus, EmailLog } from '../types';
 import { mockAttendanceRecords, mockStudents } from '../data/mockData';
 
@@ -12,11 +12,13 @@ export const useAttendance = () => {
     console.log('Enregistrements d\'absence actuels:', attendanceRecords);
   }, [attendanceRecords]);
 
-  // Utiliser useMemo pour que les calculs se mettent à jour automatiquement
-  const calculateAttendanceSummary = useMemo(() => {
-    return (studentId: string): AttendanceSummary => {
-      const studentRecords = attendanceRecords.filter(record => record.studentId === studentId);
-      
+  // Fonction pour calculer le résumé des absences d'un élève
+  const calculateAttendanceSummary = useCallback(
+    (studentId: string): AttendanceSummary => {
+      const studentRecords = attendanceRecords.filter(
+        record => record.studentId === studentId
+      );
+
       let totalUnjustified = 0;
       let totalExcused = 0;
       let totalMedical = 0;
@@ -61,8 +63,9 @@ export const useAttendance = () => {
         totalMedical,
         totalPresent
       };
-    };
-  }, [attendanceRecords]); // Dépendance sur attendanceRecords
+    },
+    [attendanceRecords]
+  );
 
   const updateAttendance = (
     studentId: string,
