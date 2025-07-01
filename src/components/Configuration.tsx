@@ -26,6 +26,17 @@ export const Configuration: React.FC<ConfigurationProps> = ({ students, onStuden
   const [studentClass, setStudentClass] = useState('');
   const [singleStatus, setSingleStatus] = useState<'idle' | 'error' | 'success'>('idle');
   const [singleMessage, setSingleMessage] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredStudents = students.filter((s) => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return false;
+    return (
+      s.firstName.toLowerCase().includes(term) ||
+      s.lastName.toLowerCase().includes(term) ||
+      s.class.toLowerCase().includes(term)
+    );
+  });
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -417,6 +428,14 @@ export const Configuration: React.FC<ConfigurationProps> = ({ students, onStuden
           </button>
         </div>
 
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Rechercher par nom, prénom ou classe"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
@@ -428,7 +447,21 @@ export const Configuration: React.FC<ConfigurationProps> = ({ students, onStuden
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {students.map((student) => (
+              {searchTerm === '' && (
+                <tr>
+                  <td colSpan={4} className="px-4 py-2 text-center text-gray-500">
+                    Recherchez un élève
+                  </td>
+                </tr>
+              )}
+              {searchTerm !== '' && filteredStudents.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-4 py-2 text-center text-gray-500">
+                    Aucun résultat
+                  </td>
+                </tr>
+              )}
+              {filteredStudents.map((student) => (
                 <tr key={student.id}>
                   <td className="px-4 py-2">{student.firstName} {student.lastName}</td>
                   <td className="px-4 py-2">{student.class}</td>
