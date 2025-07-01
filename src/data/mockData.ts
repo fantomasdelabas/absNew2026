@@ -62,13 +62,6 @@ export const mockStudents: Student[] = [
 export const mockAttendanceRecords: AttendanceRecord[] = [
   // Données pour simuler des absences sur plusieurs jours
   {
-    id: '1',
-    studentId: '1',
-    date: '2024-01-15',
-    morningStatus: 'I',
-    afternoonStatus: 'I'
-  },
-  {
     id: '2',
     studentId: '2',
     date: '2024-01-15',
@@ -80,7 +73,7 @@ export const mockAttendanceRecords: AttendanceRecord[] = [
     studentId: '3',
     date: '2024-01-15',
     morningStatus: 'E',
-    afternoonStatus: 'I'
+    afternoonStatus: ''
   },
   {
     id: '4',

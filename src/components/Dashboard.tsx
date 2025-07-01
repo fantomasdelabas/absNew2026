@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { BarChart3, Users, AlertTriangle, CheckCircle, Mail, ChevronUp, ChevronDown, Minus } from 'lucide-react';
+import { BarChart3, Users, AlertTriangle, Mail, ChevronUp, ChevronDown, Minus } from 'lucide-react';
 import { Student, AttendanceSummary } from '../types';
 import { sendAlertEmail } from '../utils/emailService';
 
@@ -9,7 +9,7 @@ interface DashboardProps {
   addEmailLog: (studentId: string, templateType: 'absence' | 'alert' | 'reminder') => void;
 }
 
-type SortField = 'name' | 'class' | 'present' | 'excused' | 'medical' | 'unjustified';
+type SortField = 'name' | 'class' | 'excused' | 'medical' | 'unjustified';
 type SortDirection = 'asc' | 'desc';
 
 interface ColumnFilter {
@@ -31,7 +31,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSum
   const totalStudents = students.length;
   const studentsWithAlerts = summaries.filter(s => s.summary.totalUnjustified > 8).length;
   const totalUnjustified = summaries.reduce((acc, s) => acc + s.summary.totalUnjustified, 0);
-  const totalPresent = summaries.reduce((acc, s) => acc + s.summary.totalPresent, 0);
 
   // Fonction pour gérer le tri
   const handleSort = (field: SortField) => {
@@ -47,7 +46,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSum
   const addColumnFilter = (field: SortField, type: 'min' | 'max') => {
     const values = summaries.map(s => {
       switch (field) {
-        case 'present': return s.summary.totalPresent;
         case 'excused': return s.summary.totalExcused;
         case 'medical': return s.summary.totalMedical;
         case 'unjustified': return s.summary.totalUnjustified;
@@ -87,7 +85,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSum
       filtered = filtered.filter(item => {
         let value = 0;
         switch (filter.field) {
-          case 'present': value = item.summary.totalPresent; break;
           case 'excused': value = item.summary.totalExcused; break;
           case 'medical': value = item.summary.totalMedical; break;
           case 'unjustified': value = item.summary.totalUnjustified; break;
@@ -111,10 +108,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSum
         case 'class':
           aValue = a.student.class;
           bValue = b.student.class;
-          break;
-        case 'present':
-          aValue = a.summary.totalPresent;
-          bValue = b.summary.totalPresent;
           break;
         case 'excused':
           aValue = a.summary.totalExcused;
@@ -179,12 +172,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSum
       icon: BarChart3,
       color: 'bg-orange-500'
     },
-    {
-      title: 'Présences Totales',
-      value: totalPresent,
-      icon: CheckCircle,
-      color: 'bg-green-500'
-    }
   ];
 
   return (
@@ -250,7 +237,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSum
             {columnFilters.map((filter, index) => (
               <div key={index} className="flex items-center gap-1 bg-blue-100 px-2 py-1 rounded text-sm text-blue-800">
                 <span>
-                  {filter.field === 'present' && 'Présences'}
                   {filter.field === 'excused' && 'Excusées'}
                   {filter.field === 'medical' && 'Médicales'}
                   {filter.field === 'unjustified' && 'Injustifiées'}
@@ -293,42 +279,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSum
                     Élève
                     {getSortIcon('name')}
                   </button>
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <div className="flex items-center justify-between">
-                    <button
-                      onClick={() => handleSort('present')}
-                      className="flex items-center hover:text-gray-700 transition-colors"
-                    >
-                      Présences
-                      {getSortIcon('present')}
-                    </button>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => addColumnFilter('present', 'min')}
-                        className="p-1 text-green-600 hover:bg-green-100 rounded transition-colors"
-                        title="Filtrer valeur minimum"
-                      >
-                        <ChevronUp className="w-3 h-3" />
-                      </button>
-                      <button
-                        onClick={() => addColumnFilter('present', 'max')}
-                        className="p-1 text-green-600 hover:bg-green-100 rounded transition-colors"
-                        title="Filtrer valeur maximum"
-                      >
-                        <ChevronDown className="w-3 h-3" />
-                      </button>
-                      {getColumnFilter('present') && (
-                        <button
-                          onClick={() => removeColumnFilter('present')}
-                          className="p-1 text-red-600 hover:bg-red-100 rounded transition-colors"
-                          title="Supprimer filtre"
-                        >
-                          <Minus className="w-3 h-3" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <div className="flex items-center justify-between">
@@ -458,11 +408,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSum
                         <div className="text-sm text-gray-500">{student.class}</div>
                       </div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      {summary.totalPresent}
-                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
