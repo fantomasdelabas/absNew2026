@@ -6,7 +6,7 @@ export interface Student {
   class: string;
 }
 
-export type AttendanceStatus = 'I' | 'E' | 'M' | 'O' | '';
+export type AttendanceStatus = 'E' | 'M' | 'O' | '';
 
 export interface AttendanceRecord {
   id: string;
@@ -22,7 +22,6 @@ export interface AttendanceSummary {
   totalUnjustified: number;
   totalExcused: number;
   totalMedical: number;
-  totalPresent: number;
 }
 
 export interface EmailLog {
@@ -33,7 +32,6 @@ export interface EmailLog {
 }
 
 export const STATUS_LABELS: Record<AttendanceStatus, string> = {
-  'I': 'Présent',
   'E': 'Excusé',
   'M': 'Certificat médical',
   'O': 'Non excusé',
@@ -41,7 +39,6 @@ export const STATUS_LABELS: Record<AttendanceStatus, string> = {
 };
 
 export const STATUS_COLORS: Record<AttendanceStatus, string> = {
-  'I': 'bg-green-100 text-green-800',
   'E': 'bg-blue-100 text-blue-800',
   'M': 'bg-purple-100 text-purple-800',
   'O': 'bg-red-100 text-red-800',

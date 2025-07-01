@@ -65,8 +65,8 @@ export const AttendanceEncoder: React.FC<AttendanceEncoderProps> = ({
       
       newPendingChanges[student.id] = {
         studentId: student.id,
-        morningStatus: existingAttendance?.morningStatus || 'I', // Présent par défaut
-        afternoonStatus: existingAttendance?.afternoonStatus || 'I' // Présent par défaut
+        morningStatus: existingAttendance?.morningStatus || '',
+        afternoonStatus: existingAttendance?.afternoonStatus || ''
       };
     });
     
@@ -128,8 +128,8 @@ export const AttendanceEncoder: React.FC<AttendanceEncoderProps> = ({
   const getCurrentAttendance = (studentId: string) => {
     return pendingChanges[studentId] || {
       studentId,
-      morningStatus: 'I',
-      afternoonStatus: 'I'
+      morningStatus: '',
+      afternoonStatus: ''
     };
   };
 
@@ -235,12 +235,8 @@ export const AttendanceEncoder: React.FC<AttendanceEncoderProps> = ({
       <div className="p-6">
         {/* Bouton d'enregistrement principal */}
         <div className="mb-6 flex items-center justify-between">
-          <div className="grid grid-cols-5 gap-2 text-xs font-medium text-gray-500">
+          <div className="grid grid-cols-4 gap-2 text-xs font-medium text-gray-500">
             <div>Légende:</div>
-            <div className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-              I = Présent
-            </div>
             <div className="flex items-center gap-1">
               <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
               E = Excusé
@@ -329,7 +325,6 @@ export const AttendanceEncoder: React.FC<AttendanceEncoderProps> = ({
                           )}
                           className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                         >
-                          <option value="I">I - Présent</option>
                           <option value="E">E - Excusé</option>
                           <option value="M">M - Certificat</option>
                           <option value="O">O - Non excusé</option>
@@ -350,7 +345,6 @@ export const AttendanceEncoder: React.FC<AttendanceEncoderProps> = ({
                           )}
                           className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                         >
-                          <option value="I">I - Présent</option>
                           <option value="E">E - Excusé</option>
                           <option value="M">M - Certificat</option>
                           <option value="O">O - Non excusé</option>
@@ -395,14 +389,7 @@ export const AttendanceEncoder: React.FC<AttendanceEncoderProps> = ({
 
         {/* Info Section */}
         <div className="mt-6 pt-4 border-t border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-600 bg-green-50 px-4 py-2 rounded-lg border border-green-200">
-              <span className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-green-600" />
-                Tous les élèves sont marqués "Présent" par défaut
-              </span>
-            </div>
-            
+          <div className="flex items-center justify-end">
             {hasUnsavedChanges && (
               <div className="text-sm text-orange-600 bg-orange-50 px-4 py-2 rounded-lg border border-orange-200">
                 <span className="flex items-center gap-2">

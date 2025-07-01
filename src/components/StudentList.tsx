@@ -136,7 +136,7 @@ export const StudentList: React.FC<StudentListProps> = ({
                       </span>
                       {summary.totalUnjustified > 0 && (
                         <div className="text-xs text-gray-500">
-                          ({summary.totalPresent}P, {summary.totalExcused}E, {summary.totalMedical}M)
+                          ({summary.totalExcused}E, {summary.totalMedical}M)
                         </div>
                       )}
                     </div>
@@ -168,9 +168,6 @@ export const StudentList: React.FC<StudentListProps> = ({
         <div className="flex items-center justify-between text-sm text-gray-600">
           <div className="flex items-center gap-4">
             <span>Légende:</span>
-            <div className="flex items-center gap-1">
-              <span className="text-xs">P = Présent</span>
-            </div>
             <div className="flex items-center gap-1">
               <span className="text-xs">E = Excusé</span>
             </div>

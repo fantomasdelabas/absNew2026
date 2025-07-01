@@ -22,7 +22,6 @@ export const useAttendance = () => {
       let totalUnjustified = 0;
       let totalExcused = 0;
       let totalMedical = 0;
-      let totalPresent = 0;
 
       studentRecords.forEach(record => {
         // Matin
@@ -32,8 +31,6 @@ export const useAttendance = () => {
           totalExcused++;
         } else if (record.morningStatus === 'M') {
           totalMedical++;
-        } else if (record.morningStatus === 'I') {
-          totalPresent++;
         }
 
         // Après-midi
@@ -43,8 +40,6 @@ export const useAttendance = () => {
           totalExcused++;
         } else if (record.afternoonStatus === 'M') {
           totalMedical++;
-        } else if (record.afternoonStatus === 'I') {
-          totalPresent++;
         }
       });
 
@@ -52,7 +47,6 @@ export const useAttendance = () => {
         totalUnjustified,
         totalExcused,
         totalMedical,
-        totalPresent,
         records: studentRecords
       });
 
@@ -60,8 +54,7 @@ export const useAttendance = () => {
         studentId,
         totalUnjustified,
         totalExcused,
-        totalMedical,
-        totalPresent
+        totalMedical
       };
     },
     [attendanceRecords]
