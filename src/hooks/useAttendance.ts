@@ -67,7 +67,7 @@ export const useAttendance = () => {
     status: AttendanceStatus
   ) => {
     console.log('Mise à jour:', { studentId, date, period, status });
-    
+
     setAttendanceRecords(prev => {
       const existingIndex = prev.findIndex(
         record => record.studentId === studentId && record.date === date
@@ -81,9 +81,24 @@ export const useAttendance = () => {
         } else {
           updated[existingIndex].afternoonStatus = status;
         }
+        // Supprimer l'enregistrement s'il ne reste plus aucune valeur
+        if (
+          updated[existingIndex].morningStatus === '' &&
+          updated[existingIndex].afternoonStatus === ''
+        ) {
+          updated.splice(existingIndex, 1);
+          console.log('Enregistrement supprimé (vide)');
+          return updated;
+        }
+
         console.log('Enregistrement modifié:', updated[existingIndex]);
         return updated;
       } else {
+        // Ne rien faire si le statut est vide
+        if (status === '') {
+          return prev;
+        }
+
         // Créer un nouvel enregistrement
         const newRecord: AttendanceRecord = {
           id: `${Date.now()}-${Math.random()}`,
