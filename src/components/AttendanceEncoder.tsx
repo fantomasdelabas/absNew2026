@@ -318,13 +318,16 @@ export const AttendanceEncoder: React.FC<AttendanceEncoderProps> = ({
                       <td className="px-4 py-4 whitespace-nowrap text-center">
                         <select
                           value={morningStatus}
-                          onChange={(e) => handleStatusChange(
-                            student.id,
-                            'morning',
-                            e.target.value as AttendanceStatus
-                          )}
+                          onChange={(e) =>
+                            handleStatusChange(
+                              student.id,
+                              'morning',
+                              e.target.value as AttendanceStatus
+                            )
+                          }
                           className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                         >
+                          <option value=""></option>
                           <option value="E">E - Excusé</option>
                           <option value="M">M - Certificat</option>
                           <option value="O">O - Non excusé</option>
@@ -338,13 +341,16 @@ export const AttendanceEncoder: React.FC<AttendanceEncoderProps> = ({
                       <td className="px-4 py-4 whitespace-nowrap text-center">
                         <select
                           value={afternoonStatus}
-                          onChange={(e) => handleStatusChange(
-                            student.id,
-                            'afternoon',
-                            e.target.value as AttendanceStatus
-                          )}
+                          onChange={(e) =>
+                            handleStatusChange(
+                              student.id,
+                              'afternoon',
+                              e.target.value as AttendanceStatus
+                            )
+                          }
                           className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                         >
+                          <option value=""></option>
                           <option value="E">E - Excusé</option>
                           <option value="M">M - Certificat</option>
                           <option value="O">O - Non excusé</option>
