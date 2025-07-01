@@ -134,11 +134,9 @@ export const StudentList: React.FC<StudentListProps> = ({
                       }`}>
                         {summary.totalUnjustified} demi-jours
                       </span>
-                      {summary.totalUnjustified > 0 && (
-                        <div className="text-xs text-gray-500">
-                          ({summary.totalExcused}E, {summary.totalMedical}M)
-                        </div>
-                      )}
+                      <div className="text-xs text-gray-500">
+                        ({summary.totalExcused}E, {summary.totalMedical}M)
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
