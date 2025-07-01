@@ -126,6 +126,24 @@ export const useAttendance = () => {
     });
   };
 
+  const addStudent = (student: Student) => {
+    setStudents(prev => {
+      const exists = prev.some(
+        s => s.parentEmail.toLowerCase() === student.parentEmail.toLowerCase()
+      );
+      if (exists) {
+        console.warn('Étudiant déjà existant, ajout ignoré');
+        return prev;
+      }
+      return [...prev, student];
+    });
+  };
+
+  const removeStudent = (studentId: string) => {
+    setStudents(prev => prev.filter(s => s.id !== studentId));
+    setAttendanceRecords(prev => prev.filter(r => r.studentId !== studentId));
+  };
+
   const addEmailLog = (studentId: string, templateType: 'absence' | 'alert' | 'reminder') => {
     const log: EmailLog = {
       id: `${Date.now()}-${Math.random()}`,
@@ -153,6 +171,8 @@ export const useAttendance = () => {
     updateAttendance,
     addEmailLog,
     addStudents,
+    addStudent,
+    removeStudent,
     getAttendanceForDate,
     getStudentAttendanceForDate,
     calculateAttendanceSummary

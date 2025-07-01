@@ -5,11 +5,13 @@ import { EmailTemplate, getEmailTemplates, saveEmailTemplates } from '../utils/e
 import * as XLSX from 'xlsx';
 
 interface ConfigurationProps {
+  students: Student[];
   onStudentsImported: (students: Student[]) => void;
+  onStudentAdded: (student: Student) => void;
+  onStudentDeleted: (studentId: string) => void;
 }
 
-
-export const Configuration: React.FC<ConfigurationProps> = ({ onStudentsImported }) => {
+export const Configuration: React.FC<ConfigurationProps> = ({ students, onStudentsImported, onStudentAdded, onStudentDeleted }) => {
   const [importStatus, setImportStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [importMessage, setImportMessage] = useState('');
   const [importedCount, setImportedCount] = useState(0);
@@ -17,6 +19,13 @@ export const Configuration: React.FC<ConfigurationProps> = ({ onStudentsImported
   const [editingTemplate, setEditingTemplate] = useState<string | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [parentEmail, setParentEmail] = useState('');
+  const [studentClass, setStudentClass] = useState('');
+  const [singleStatus, setSingleStatus] = useState<'idle' | 'error' | 'success'>('idle');
+  const [singleMessage, setSingleMessage] = useState('');
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -113,6 +122,34 @@ export const Configuration: React.FC<ConfigurationProps> = ({ onStudentsImported
     worksheet['!cols'] = colWidths;
 
     XLSX.writeFile(workbook, 'modele_eleves.xlsx');
+  };
+
+  const handleAddSingleStudent = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!firstName || !lastName || !parentEmail || !studentClass) {
+      setSingleStatus('error');
+      setSingleMessage('Tous les champs sont obligatoires');
+      return;
+    }
+    if (!emailRegex.test(parentEmail)) {
+      setSingleStatus('error');
+      setSingleMessage('Email parent invalide');
+      return;
+    }
+    const newStudent: Student = {
+      id: `manual-${Date.now()}`,
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      parentEmail: parentEmail.trim().toLowerCase(),
+      class: studentClass.trim()
+    };
+    onStudentAdded(newStudent);
+    setSingleStatus('success');
+    setSingleMessage('Élève ajouté');
+    setFirstName('');
+    setLastName('');
+    setParentEmail('');
+    setStudentClass('');
   };
 
   const resetImportStatus = () => {
@@ -321,10 +358,99 @@ export const Configuration: React.FC<ConfigurationProps> = ({ onStudentsImported
               </div>
             ))}
           </div>
+      </div>
+    </div>
+
+    {/* Single Student Section */}
+    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="px-6 py-4 bg-blue-50 border-b">
+        <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+          <Users className="w-5 h-5" />
+          Gestion des Élèves
+        </h3>
+        <p className="text-sm text-gray-600 mt-1">
+          Ajouter un élève individuellement ou supprimer un élève existant
+        </p>
+      </div>
+      <div className="p-6 space-y-6">
+        {singleStatus !== 'idle' && (
+          <div className={`p-4 rounded-lg border ${
+            singleStatus === 'success' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+          }`}>
+            <p className={`text-sm ${singleStatus === 'success' ? 'text-green-700' : 'text-red-700'}`}>{singleMessage}</p>
+          </div>
+        )}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <input
+            type="text"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="Prénom"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="text"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            placeholder="Nom"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="email"
+            value={parentEmail}
+            onChange={(e) => setParentEmail(e.target.value)}
+            placeholder="Email Parent"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="text"
+            value={studentClass}
+            onChange={(e) => setStudentClass(e.target.value)}
+            placeholder="Classe"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={handleAddSingleStudent}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            Ajouter
+          </button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-2 text-left">Nom</th>
+                <th className="px-4 py-2 text-left">Classe</th>
+                <th className="px-4 py-2 text-left">Email Parent</th>
+                <th className="px-4 py-2"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {students.map((student) => (
+                <tr key={student.id}>
+                  <td className="px-4 py-2">{student.firstName} {student.lastName}</td>
+                  <td className="px-4 py-2">{student.class}</td>
+                  <td className="px-4 py-2">{student.parentEmail}</td>
+                  <td className="px-4 py-2 text-right">
+                    <button
+                      onClick={() => onStudentDeleted(student.id)}
+                      className="p-1 text-red-600 hover:bg-red-100 rounded"
+                      title="Supprimer"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
+    </div>
 
-      {/* Import Section */}
+    {/* Import Section */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="px-6 py-4 bg-green-50 border-b">
           <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
