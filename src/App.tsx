@@ -17,6 +17,8 @@ function App() {
     students,
     calculateAttendanceSummary,
     addStudents,
+    addStudent,
+    removeStudent,
     updateAttendance,
     getStudentAttendanceForDate,
     attendanceRecords,
@@ -72,7 +74,14 @@ function App() {
           />
         );
       case 'configuration':
-        return <Configuration onStudentsImported={addStudents} />;
+        return (
+          <Configuration
+            students={students}
+            onStudentsImported={addStudents}
+            onStudentAdded={addStudent}
+            onStudentDeleted={removeStudent}
+          />
+        );
       default:
         return null;
     }
