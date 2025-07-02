@@ -42,11 +42,6 @@ app.whenReady().then(() => {
     CREATE TABLE IF NOT EXISTS absences (id INTEGER PRIMARY KEY AUTOINCREMENT, eleve_id INTEGER, date TEXT, motif TEXT, FOREIGN KEY (eleve_id) REFERENCES eleves(id));
   `);
 
-  if (db.prepare('SELECT COUNT(*) AS n FROM eleves').get().n === 0) {
-    const stmt = db.prepare('INSERT INTO eleves (nom, classe) VALUES (?, ?)');
-    stmt.run('Élève de démo 1', 'P1A');
-    stmt.run('Élève de démo 2', 'P2B');
-  }
 
   ipcMain.handle('save-eleve', (_e, d) =>
     db.prepare('INSERT INTO eleves (nom, classe) VALUES (?,?)').run(d.nom, d.classe).lastInsertRowid
