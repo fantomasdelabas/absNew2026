@@ -139,6 +139,12 @@ export const useAttendance = () => {
     });
   };
 
+  const updateStudent = (updated: Student) => {
+    setStudents(prev =>
+      prev.map(s => (s.id === updated.id ? { ...s, ...updated } : s))
+    );
+  };
+
   const removeStudent = (studentId: string) => {
     setStudents(prev => prev.filter(s => s.id !== studentId));
     setAttendanceRecords(prev => prev.filter(r => r.studentId !== studentId));
@@ -172,6 +178,7 @@ export const useAttendance = () => {
     addEmailLog,
     addStudents,
     addStudent,
+    updateStudent,
     removeStudent,
     getAttendanceForDate,
     getStudentAttendanceForDate,
