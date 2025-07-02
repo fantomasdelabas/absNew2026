@@ -155,7 +155,7 @@ export const Configuration: React.FC<ConfigurationProps> = ({ students, onStuden
       return;
     }
     const newStudent: Student = {
-      id: `manual-${Date.now()}`,
+      id: `${Date.now()}`,
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       parentEmail: parentEmail.trim().toLowerCase(),
