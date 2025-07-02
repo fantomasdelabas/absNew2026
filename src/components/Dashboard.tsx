@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { BarChart3, Users, AlertTriangle, Mail, ChevronUp, ChevronDown, Minus } from 'lucide-react';
+import { BarChart3, Users, AlertTriangle, Mail, ChevronUp, ChevronDown, Minus, Search, Filter } from 'lucide-react';
 import { Student, AttendanceSummary } from '../types';
 import { sendAlertEmail } from '../utils/emailService';
 
@@ -22,6 +22,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSum
   const [sortField, setSortField] = useState<SortField>('unjustified');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([]);
+  const [nameFilter, setNameFilter] = useState('');
+  const [classFilter, setClassFilter] = useState('');
+
+  const availableClasses = useMemo(() => {
+    const classes = [...new Set(students.map(s => s.class))];
+    return classes.sort();
+  }, [students]);
 
   const summaries = students.map(student => ({
     student,
@@ -80,6 +87,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSum
   const filteredAndSortedSummaries = useMemo(() => {
     let filtered = [...summaries];
 
+    if (nameFilter.trim() !== '') {
+      const term = nameFilter.toLowerCase();
+      filtered = filtered.filter(item =>
+        `${item.student.firstName} ${item.student.lastName}`.toLowerCase().includes(term)
+      );
+    }
+
+    if (classFilter !== '') {
+      filtered = filtered.filter(item => item.student.class === classFilter);
+    }
+
     // Appliquer les filtres
     columnFilters.forEach(filter => {
       filtered = filtered.filter(item => {
@@ -135,7 +153,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSum
     });
 
     return filtered;
-  }, [summaries, columnFilters, sortField, sortDirection]);
+  }, [summaries, columnFilters, sortField, sortDirection, nameFilter, classFilter]);
 
   const handleSendAlertEmail = (student: Student, absenceCount: number) => {
     sendAlertEmail(student, absenceCount);
@@ -151,6 +169,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSum
 
   const getColumnFilter = (field: SortField) => {
     return columnFilters.find(f => f.field === field);
+  };
+
+  const clearFilters = () => {
+    setNameFilter('');
+    setClassFilter('');
   };
 
   const stats = [
@@ -260,6 +283,52 @@ export const Dashboard: React.FC<DashboardProps> = ({ students, getAttendanceSum
           </div>
         </div>
       )}
+
+      {/* Filtres par nom et classe */}
+      <div className="bg-gray-50 border rounded-lg p-4 flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-gray-500" />
+          <span className="text-sm font-medium text-gray-700">Filtres :</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Search className="w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Rechercher par nom..."
+            value={nameFilter}
+            onChange={(e) => setNameFilter(e.target.value)}
+            className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <select
+            value={classFilter}
+            onChange={(e) => setClassFilter(e.target.value)}
+            className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Toutes les classes</option>
+            {availableClasses.map((className) => (
+              <option key={className} value={className}>
+                {className}
+              </option>
+            ))}
+          </select>
+        </div>
+        {(nameFilter || classFilter) && (
+          <button
+            onClick={clearFilters}
+            className="px-3 py-1 text-sm text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+          >
+            Effacer les filtres
+          </button>
+        )}
+        <div className="ml-auto text-sm text-gray-600">
+          {filteredAndSortedSummaries.length} élève{filteredAndSortedSummaries.length > 1 ? 's' : ''} affiché{filteredAndSortedSummaries.length > 1 ? 's' : ''}
+          {filteredAndSortedSummaries.length !== summaries.length && (
+            <span className="text-gray-500"> sur {summaries.length}</span>
+          )}
+        </div>
+      </div>
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="px-6 py-4 bg-gray-50 border-b">
