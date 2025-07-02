@@ -9,16 +9,8 @@ export interface EmailTemplate {
   type: 'absence' | 'alert' | 'reminder';
 }
 
-// Modèles par défaut (peuvent être récupérés depuis localStorage ou une base de données)
+// Modèles par défaut
 export const getEmailTemplates = (): EmailTemplate[] => {
-  const saved = localStorage.getItem('emailTemplates');
-  if (saved) {
-    try {
-      return JSON.parse(saved);
-    } catch (e) {
-      console.error('Erreur lors du chargement des modèles d\'emails:', e);
-    }
-  }
 
   // Modèles par défaut
   return [
@@ -152,13 +144,8 @@ export const getTodayString = (): string => {
 
 // Fonction pour sauvegarder les templates
 export const saveEmailTemplates = (templates: EmailTemplate[]) => {
-  try {
-    localStorage.setItem('emailTemplates', JSON.stringify(templates));
-    return true;
-  } catch (e) {
-    console.error('Erreur lors de la sauvegarde des modèles d\'emails:', e);
-    return false;
-  }
+  console.warn('Persistence des modèles désactivée.');
+  return true;
 };
 
 // Fonction pour récupérer un template spécifique
