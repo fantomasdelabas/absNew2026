@@ -19,6 +19,7 @@ function App() {
     addStudents,
     addStudent,
     removeStudent,
+    updateStudent,
     updateAttendance,
     getStudentAttendanceForDate,
     attendanceRecords,
@@ -80,6 +81,7 @@ function App() {
             onStudentsImported={addStudents}
             onStudentAdded={addStudent}
             onStudentDeleted={removeStudent}
+            onStudentUpdated={updateStudent}
           />
         );
       default:

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Settings, Upload, Download, FileSpreadsheet, Users, AlertCircle, CheckCircle, Trash2, Mail, Edit3, Save, Eye } from 'lucide-react';
+import { Settings, Upload, Download, FileSpreadsheet, Users, AlertCircle, CheckCircle, Trash2, Mail, Edit3, Save, Eye, X } from 'lucide-react';
 import { Student } from '../types';
 import { EmailTemplate, getEmailTemplates, saveEmailTemplates } from '../utils/emailService';
 import * as XLSX from 'xlsx';
@@ -9,9 +9,10 @@ interface ConfigurationProps {
   onStudentsImported: (students: Student[]) => void;
   onStudentAdded: (student: Student) => void;
   onStudentDeleted: (studentId: string) => void;
+  onStudentUpdated: (student: Student) => void;
 }
 
-export const Configuration: React.FC<ConfigurationProps> = ({ students, onStudentsImported, onStudentAdded, onStudentDeleted }) => {
+export const Configuration: React.FC<ConfigurationProps> = ({ students, onStudentsImported, onStudentAdded, onStudentDeleted, onStudentUpdated }) => {
   const [importStatus, setImportStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [importMessage, setImportMessage] = useState('');
   const [importedCount, setImportedCount] = useState(0);
@@ -27,6 +28,12 @@ export const Configuration: React.FC<ConfigurationProps> = ({ students, onStuden
   const [singleStatus, setSingleStatus] = useState<'idle' | 'error' | 'success'>('idle');
   const [singleMessage, setSingleMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+
+  const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
+  const [editFirstName, setEditFirstName] = useState('');
+  const [editLastName, setEditLastName] = useState('');
+  const [editParentEmail, setEditParentEmail] = useState('');
+  const [editClass, setEditClass] = useState('');
 
   const filteredStudents = students.filter((s) => {
     const term = searchTerm.trim().toLowerCase();
@@ -161,6 +168,31 @@ export const Configuration: React.FC<ConfigurationProps> = ({ students, onStuden
     setLastName('');
     setParentEmail('');
     setStudentClass('');
+  };
+
+  const startEditStudent = (student: Student) => {
+    setEditingStudentId(student.id);
+    setEditFirstName(student.firstName);
+    setEditLastName(student.lastName);
+    setEditParentEmail(student.parentEmail);
+    setEditClass(student.class);
+  };
+
+  const saveEditedStudent = () => {
+    if (!editingStudentId) return;
+    const updated: Student = {
+      id: editingStudentId,
+      firstName: editFirstName.trim(),
+      lastName: editLastName.trim(),
+      parentEmail: editParentEmail.trim().toLowerCase(),
+      class: editClass.trim()
+    };
+    onStudentUpdated(updated);
+    setEditingStudentId(null);
+  };
+
+  const cancelEditStudent = () => {
+    setEditingStudentId(null);
   };
 
   const resetImportStatus = () => {
@@ -463,18 +495,84 @@ export const Configuration: React.FC<ConfigurationProps> = ({ students, onStuden
               )}
               {filteredStudents.map((student) => (
                 <tr key={student.id}>
-                  <td className="px-4 py-2">{student.firstName} {student.lastName}</td>
-                  <td className="px-4 py-2">{student.class}</td>
-                  <td className="px-4 py-2">{student.parentEmail}</td>
-                  <td className="px-4 py-2 text-right">
-                    <button
-                      onClick={() => onStudentDeleted(student.id)}
-                      className="p-1 text-red-600 hover:bg-red-100 rounded"
-                      title="Supprimer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </td>
+                  {editingStudentId === student.id ? (
+                    <>
+                      <td className="px-4 py-2">
+                        <div className="grid grid-cols-2 gap-1">
+                          <input
+                            type="text"
+                            value={editFirstName}
+                            onChange={(e) => setEditFirstName(e.target.value)}
+                            placeholder="Prénom"
+                            className="px-2 py-1 border border-gray-300 rounded-md"
+                          />
+                          <input
+                            type="text"
+                            value={editLastName}
+                            onChange={(e) => setEditLastName(e.target.value)}
+                            placeholder="Nom"
+                            className="px-2 py-1 border border-gray-300 rounded-md"
+                          />
+                        </div>
+                      </td>
+                      <td className="px-4 py-2">
+                        <input
+                          type="text"
+                          value={editClass}
+                          onChange={(e) => setEditClass(e.target.value)}
+                          placeholder="Classe"
+                          className="px-2 py-1 border border-gray-300 rounded-md w-full"
+                        />
+                      </td>
+                      <td className="px-4 py-2">
+                        <input
+                          type="email"
+                          value={editParentEmail}
+                          onChange={(e) => setEditParentEmail(e.target.value)}
+                          placeholder="Email Parent"
+                          className="px-2 py-1 border border-gray-300 rounded-md w-full"
+                        />
+                      </td>
+                      <td className="px-4 py-2 text-right space-x-1">
+                        <button
+                          onClick={saveEditedStudent}
+                          className="p-1 text-green-600 hover:bg-green-100 rounded"
+                          title="Sauvegarder"
+                        >
+                          <Save className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={cancelEditStudent}
+                          className="p-1 text-gray-600 hover:bg-gray-100 rounded"
+                          title="Annuler"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="px-4 py-2">{student.firstName} {student.lastName}</td>
+                      <td className="px-4 py-2">{student.class}</td>
+                      <td className="px-4 py-2">{student.parentEmail}</td>
+                      <td className="px-4 py-2 text-right space-x-1">
+                        <button
+                          onClick={() => startEditStudent(student)}
+                          className="p-1 text-blue-600 hover:bg-blue-100 rounded"
+                          title="Modifier"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => onStudentDeleted(student.id)}
+                          className="p-1 text-red-600 hover:bg-red-100 rounded"
+                          title="Supprimer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </>
+                  )}
                 </tr>
               ))}
             </tbody>
